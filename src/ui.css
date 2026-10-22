@@ -69,7 +69,7 @@
     align-self: flex-start;
     padding: 2px 10px;
     border-radius: 999px;
-    background: color-mix(in srgb, #b078ec 70%, transparent);
+    background: color-mix(in srgb, #00cc47, transparent);
     font-size: 12px;
     font-weight: 500;
 }
@@ -94,7 +94,7 @@
 
 #gut-usage .gut-pct {
     min-width: 30px;
-    color: #4c96ff;
+    color: var(--gut-c, #4c96ff);
 }
 
 #gut-usage .gut-reset {
@@ -114,6 +114,100 @@
     height: 6px;
     width: 0;
     border-radius: 5px;
-    background: #4c96ff;
+    background: var(--gut-c, #4c96ff);
     transition: width 0.4s ease;
+}
+
+#gut-usage .gut-row[data-level="warn"] {
+    --gut-c: #ffa629;
+}
+
+#gut-usage .gut-row[data-level="crit"] {
+    --gut-c: #ff5449;
+}
+
+#gut-ring {
+    --gut-c: #4c96ff;
+    position: fixed;
+    z-index: 10;
+    width: 64px;
+    height: 64px;
+    font-family: "Google Sans Flex", "Google Sans", "Google Sans Text", Roboto, Arial, sans-serif;
+    pointer-events: auto;
+    cursor: default;
+}
+
+#gut-ring[data-level="warn"] {
+    --gut-c: #ffa629;
+}
+
+#gut-ring[data-level="crit"] {
+    --gut-c: #ff5449;
+}
+
+#gut-ring svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+#gut-ring .gut-ring-track {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.15);
+    stroke-width: 4;
+}
+
+#gut-ring .gut-ring-arc {
+    fill: none;
+    stroke: var(--gut-c);
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.4s ease, stroke 0.3s ease;
+}
+
+#gut-ring .gut-ring-time {
+    fill: #e3e3e3;
+    font-size: 11px;
+    font-weight: 500;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+#gut-ring .gut-ring-mark {
+    transform-box: view-box;
+    transform-origin: 50% 50%;
+    transition: transform 0.4s ease;
+}
+
+#gut-ring .gut-ring-mark line {
+    stroke: #ea4335;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+}
+
+#gut-ring .gut-ring-mark polygon {
+    fill: #ea4335;
+}
+
+#gut-ring .gut-ring-tip {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 8px);
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: #303030;
+    color: #e3e3e3;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease, visibility 0s 0.15s;
+}
+
+#gut-ring:hover .gut-ring-tip {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.15s ease;
 }

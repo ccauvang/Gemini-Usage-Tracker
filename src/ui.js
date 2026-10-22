@@ -72,10 +72,75 @@
         return root
     }
 
+    const RING_ID = 'gut-ring'
+    const RING_R = 26
+    const CIRC = 2 * Math.PI * RING_R
+
+    function percentOf(data) {
+        if (!data || !Number.isFinite(data.percent)) return null
+        return Math.min(100, Math.max(0, data.percent))
+    }
+
+    function level(pct) {
+        if (pct === null) return 'ok'
+        if (pct > 90) return 'crit'
+        return pct >= 80 ? 'warn' : 'ok'
+    }
+
+    function svg(tag, attrs) {
+        const node = document.createElementNS('http://www.w3.org/2000/svg', tag)
+        for (const key in attrs) node.setAttribute(key, attrs[key])
+        return node
+    }
+
+    function buildRing() {
+        const root = createElement('div')
+        root.id = RING_ID
+        root.dataset.level = 'ok'
+
+        const arc = svg('circle', { class: 'gut-ring-arc', cx: 36, cy: 36, r: RING_R, transform: 'rotate(-90 36 36)' })
+        arc.style.strokeDasharray = `0 ${CIRC}`
+
+        const time = svg('text', { class: 'gut-ring-time', x: 36, y: 36 })
+        time.textContent = '--'
+
+        const mark = svg('g', { class: 'gut-ring-mark' })
+        mark.append(
+            svg('line', { x1: 36, y1: 6, x2: 36, y2: 14 }),
+            svg('polygon', { points: '36,4.5 33.5,1 38.5,1' })
+        )
+
+        const box = svg('svg', { viewBox: '0 0 72 72', 'aria-hidden': 'true' })
+        box.append(svg('circle', { class: 'gut-ring-track', cx: 36, cy: 36, r: RING_R }), arc, time, mark)
+        const tip = createElement('div', 'gut-ring-tip')
+        tip.append(
+            createElement('div', 'gut-tip-session', 'Session: --'),
+            createElement('div', 'gut-tip-weekly', 'Weekly: --')
+        )
+        root.append(box, tip)
+        return root
+    }
+
+    function renderRing(data) {
+        const root = document.getElementById(RING_ID)
+        if (!root) return
+        const session = data && data.session
+        const sp = percentOf(session)
+        const wp = percentOf(data && data.weekly)
+        root.dataset.level = level(sp)
+        root.querySelector('.gut-ring-arc').style.strokeDasharray = `${(CIRC * (sp ?? 0)) / 100} ${CIRC}`
+        root.querySelector('.gut-ring-time').textContent = (session && session.reset) || '--'
+        root.querySelector('.gut-tip-session').textContent = `Session: ${sp === null ? '--' : `${sp}%`}`
+        root.querySelector('.gut-tip-weekly').textContent = `Weekly: ${wp === null ? '--' : `${wp}%`}`
+        const mark = root.querySelector('.gut-ring-mark')
+        mark.style.display = wp === null ? 'none' : ''
+        mark.style.transform = `rotate(${(wp ?? 0) * 3.6}deg)`
+    }
+
     function setRow(root, key, data) {
         const node = root.querySelector(`.gut-row[data-key="${key}"]`)
-        const ok = data && Number.isFinite(data.percent)
-        const pct = ok ? Math.min(100, Math.max(0, data.percent)) : null
+        const pct = percentOf(data)
+        node.dataset.level = level(pct)
         node.querySelector('.gut-pct').textContent = pct === null ? '--' : `${pct}%`
         node.querySelector('.gut-fill').style.width = `${pct ?? 0}%`
         const reset = data && data.reset
@@ -84,6 +149,7 @@
 
     // data = { tier, session: { percent, reset }, weekly: { percent, reset } }, null = empty state
     function render(data) {
+        renderRing(data)
         const root = document.getElementById(ROOT_ID)
         if (!root) return
         root.querySelector('.gut-tier').textContent = (data && data.tier) || '--'
@@ -91,5 +157,5 @@
         setRow(root, 'weekly', data && data.weekly)
     }
 
-    NS.ui = { build, render, id: ROOT_ID }
+    NS.ui = { build, buildRing, render, id: ROOT_ID }
 })()

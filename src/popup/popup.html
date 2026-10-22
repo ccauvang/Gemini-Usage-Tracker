@@ -1,12 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Gemini Usage Tracker</title>
   <link rel="stylesheet" href="popup.css">
   <script src="popup.js" defer></script>
 </head>
+
 <body>
-  <p id="status">popup ok</p>
+  <header class="head">
+    <span class="title">Gemini Usage</span>
+    <span class="tier" id="tier" hidden></span>
+  </header>
+
+  <main id="data" hidden>
+    <div class="row" id="session" data-level="ok">
+      <div class="row-top">
+        <div class="row-left"><span class="label">Session:</span><span class="pct">--</span></div>
+        <span class="reset"></span>
+      </div>
+      <div class="track">
+        <div class="fill"></div>
+      </div>
+    </div>
+
+    <div class="row" id="weekly" data-level="ok">
+      <div class="row-top">
+        <div class="row-left"><span class="label">Weekly:</span><span class="pct">--</span></div>
+        <span class="reset"></span>
+      </div>
+      <div class="track">
+        <div class="fill"></div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <span id="updated">--</span>
+      <button id="refresh" type="button" aria-label="Refresh usage">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+          <path fill="currentColor"
+            d="M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4z" />
+        </svg>
+      </button>
+    </div>
+  </main>
+
+  <p class="empty" id="empty">Open a <a href="https://gemini.google.com/app" target="_blank" rel="noopener">Gemini</a>
+    chat to see usage.</p>
+
+  <label class="toggle">
+    <span class="toggle-text">
+      <span>Usage ring</span>
+      <span class="toggle-hint">Circle next to the prompt input</span>
+    </span>
+    <input type="checkbox" id="showRing" checked>
+    <span class="switch"></span>
+  </label>
 </body>
+
 </html>
