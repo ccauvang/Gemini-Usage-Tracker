@@ -11,7 +11,7 @@ None. The extension does not collect, store on any server, sell, share or transm
 ## What it does on your device
 
 - Reads your usage numbers (percent, plan name, reset time) from your own Gemini usage page, only inside your browser.
-- Saves your "show chat bar ring" setting and the last usage numbers locally with chrome.storage.local. This stays on your device.
+- Saves your "show chat bar ring" setting locally (`chrome.storage.local`) and caches the last usage numbers in memory for the open tab (`chrome.storage.session`). All data stays on your device.
 
 ## Third parties
 
@@ -25,7 +25,7 @@ No analytics, no ads, no tracking, no remote servers. The extension does not tal
 
 ## Contact
 
-gmail: ext.support@ccauvang.com
+email: ext.support@ccauvang.com
 
 ## Changes
 
