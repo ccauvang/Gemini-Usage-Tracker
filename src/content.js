@@ -24,31 +24,39 @@ const onChat = () => CHAT_ROUTE.test(location.pathname)
 
 const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
 const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+const VI_DAYS = { 'chủ nhật': 0, 'thứ hai': 1, 'thứ ba': 2, 'thứ tư': 3, 'thứ năm': 4, 'thứ sáu': 5, 'thứ bảy': 6 }
 const DAY_MS = 86400000
 
-// "Resets at 6:19 PM" / "Resets Oct 22 at 2:19 PM" / "Resets Mon at 2:19 PM" to a Date
+// "Resets at 6:19 PM" / "Resets Oct 22 at 2:19 PM" / "Resets Mon at 2:19 PM" / "Đặt lại vào 28 thg 10 lúc 14:53" to a Date
 function resetDate(text) {
-    const time = text.match(/(\d{1,2}):(\d{2})\s*(am|pm)?/i)
+    // vietnamese accents can arrive decomposed, normalize so the patterns match
+    text = text.normalize('NFC')
+    const time = text.match(/(\d{1,2}):(\d{2})(?:\s*(am|pm|sa|ch)\b)?/i)
     if (!time) return null
     let hour = Number(time[1])
     const meridiem = (time[3] || '').toLowerCase()
-    if (meridiem === 'pm' && hour < 12) hour += 12
-    if (meridiem === 'am' && hour === 12) hour = 0
+    if ((meridiem === 'pm' || meridiem === 'ch') && hour < 12) hour += 12
+    if ((meridiem === 'am' || meridiem === 'sa') && hour === 12) hour = 0
 
     const now = new Date()
     const date = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, Number(time[2]))
-    const md = text.match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+(\d{1,2})\b/i)
-    const wd = text.match(/\b(sun|mon|tue|wed|thu|fri|sat)[a-z]*\b/i)
 
-    if (md) {
-        date.setMonth(MONTHS.indexOf(md[1].toLowerCase()), Number(md[2]))
+    const en = text.match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+(\d{1,2})\b/i)
+    const vi = text.match(/(\d{1,2})\s*(?:thg|tháng)\s*(\d{1,2})/i)
+    const monthDay = en ? [MONTHS.indexOf(en[1].toLowerCase()), Number(en[2])] : vi ? [Number(vi[2]) - 1, Number(vi[1])] : null
+
+    const wdEn = text.match(/\b(sun|mon|tue|wed|thu|fri|sat)[a-z]*\b/i)
+    const wdVi = text.toLowerCase().match(/chủ nhật|thứ (?:hai|ba|tư|năm|sáu|bảy)/)
+    const weekday = wdEn ? DAYS.indexOf(wdEn[1].toLowerCase()) : wdVi ? VI_DAYS[wdVi[0]] : -1
+
+    if (monthDay) {
+        date.setMonth(monthDay[0], monthDay[1])
         // text has no year, so a date far in the past means next year
         if (date.getTime() < now.getTime() - 180 * DAY_MS) date.setFullYear(date.getFullYear() + 1)
-    } else if (/tomorrow/i.test(text)) {
+    } else if (/tomorrow|ngày mai/i.test(text)) {
         date.setDate(date.getDate() + 1)
-    } else if (wd) {
-        const target = DAYS.indexOf(wd[1].toLowerCase())
-        date.setDate(date.getDate() + ((target - date.getDay() + 7) % 7))
+    } else if (weekday >= 0) {
+        date.setDate(date.getDate() + ((weekday - date.getDay() + 7) % 7))
         if (date <= now) date.setDate(date.getDate() + 7)
     } else if (date <= now) {
         date.setDate(date.getDate() + 1)
