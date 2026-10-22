@@ -45,7 +45,8 @@
                 "required": [
                     "none"
                 ]
-            }
+            },
+            "strict_min_version": "128.0"
         }
     },
     "declarative_net_request": {

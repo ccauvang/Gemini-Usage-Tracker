@@ -65,7 +65,7 @@ There is no timer polling, and automatic refreshes are at least 15 seconds apart
 - Depends on Gemini's usage page markup. If Google changes it, scraping stops and the console prints a `[gut] scrape timeout: ...` line saying which part is missing.
 - Reset times are parsed from English text such as `Resets at 6:19 PM`. Other languages still show percents but not time left.
 - Works with Gemini's light and dark themes.
-- Chrome 102 or newer, Firefox 121 or newer.
+- Chrome 102 or newer, Firefox 128 or newer.
 
 ## License
 
