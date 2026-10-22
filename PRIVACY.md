@@ -20,7 +20,7 @@ No analytics, no ads, no tracking, no remote servers. The extension does not tal
 ## Permissions
 
 - declarativeNetRequest: lets the hidden usage page load inside Gemini.
-- storage: saves your setting and last numbers locally.
+- storage: Saves the user's "show ring" setting (chrome.storage.local) and the last read usage numbers for the open tab (chrome.storage.session, memory only, cleared when the browser closes). Nothing is sent outside the browser.
 - gemini.google.com access: show the panel and read your usage page.
 
 ## Contact
