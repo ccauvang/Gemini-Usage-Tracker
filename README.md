@@ -1,8 +1,22 @@
 # Gemini Usage Tracker
 
-Chrome extension that shows your Gemini usage limits right on the Gemini page.
+Chrome and Firefox extension that shows your Gemini usage limits right on the Gemini page.
 
-Not affiliated with Google. Gemini is a trademark of Google.
+> [!NOTE]
+> Not affiliated with Google. Gemini is a trademark of Google.
+
+## Build
+
+Chrome needs `background.service_worker` and Firefox needs `background.scripts`, so there are two manifests: `manifest.json` for Chrome and `manifest.firefox.json` for Firefox. The build script packs each one into its own zip.
+
+```ps1
+
+cd build
+npm install
+npm run build
+```
+
+Zips land in `build/dist/`.
 
 ## Install (unpacked)
 
@@ -10,6 +24,14 @@ Not affiliated with Google. Gemini is a trademark of Google.
 2. Open `chrome://extensions` and turn on **Developer mode**.
 3. Click **Load unpacked** and pick the folder that contains `manifest.json`.
 4. Open `https://gemini.google.com/app`.
+
+### Firefox (temporary)
+
+1. Open `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on** and pick `manifest.firefox.json`.
+3. Open `https://gemini.google.com/app`.
+
+Temporary add-ons are removed when Firefox closes.
 
 ## How it works
 
@@ -43,8 +65,8 @@ There is no timer polling, and automatic refreshes are at least 15 seconds apart
 
 - Depends on Gemini's usage page markup. If Google changes it, scraping stops and the console prints a `[gut] scrape timeout: ...` line saying which part is missing.
 - Reset times are parsed from English text such as `Resets at 6:19 PM`. Other languages still show percents but not time left.
-- Styled for Gemini's dark theme.
-- Chrome 102 or newer.
+- Works with Gemini's light and dark themes.
+- Chrome 102 or newer, Firefox 121 or newer.
 
 ## License
 

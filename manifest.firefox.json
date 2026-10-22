@@ -1,0 +1,66 @@
+{
+    "manifest_version": 3,
+    "name": "Gemini Usage Tracker",
+    "version": "0.1.0",
+    "description": "Show Gemini usage on the main chat page.",
+    "permissions": [
+        "declarativeNetRequest",
+        "storage"
+    ],
+    "host_permissions": [
+        "https://gemini.google.com/*"
+    ],
+    "background": {
+        "scripts": [
+            "src/background.js"
+        ]
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://gemini.google.com/*"
+            ],
+            "js": [
+                "src/ui.js",
+                "src/content.js"
+            ],
+            "css": [
+                "src/ui.css"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
+    "action": {
+        "default_title": "Gemini Usage Tracker",
+        "default_popup": "src/popup/popup.html",
+        "default_icon": {
+            "16": "assets/icon16.png",
+            "32": "assets/icon32.png"
+        }
+    },
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "ext.support@ccauvang.com",
+            "data_collection_permissions": {
+                "required": [
+                    "none"
+                ]
+            }
+        }
+    },
+    "declarative_net_request": {
+        "rule_resources": [
+            {
+                "id": "frame_headers",
+                "enabled": true,
+                "path": "src/rules.json"
+            }
+        ]
+    },
+    "icons": {
+        "16": "assets/icon16.png",
+        "32": "assets/icon32.png",
+        "48": "assets/icon48.png",
+        "128": "assets/icon128.png"
+    }
+}
