@@ -55,10 +55,9 @@ There is no timer polling, and automatic refreshes are at least 15 seconds apart
 | `storage` | Keeps the latest usage per tab (session storage) and the ring on/off setting. |
 | `https://gemini.google.com/*` | The only site the extension runs on. |
 
-## Privacy
-
 - No accounts, no analytics, no remote servers.
 - Reads only your own usage page and keeps the result in your browser.
+- Loads the Google Sans font stylesheet from fonts.googleapis.com. No other network requests.
 - No data leaves your machine.
 
 ## Limitations

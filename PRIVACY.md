@@ -15,7 +15,7 @@ None. The extension does not collect, store on any server, sell, share or transm
 
 ## Third parties
 
-No analytics, no ads, no tracking, no remote servers. The extension does not talk to any website other than gemini.google.com.
+No analytics, no ads, no tracking, no remote servers. The extension talks only to gemini.google.com, plus fonts.googleapis.com to load the Google Sans font stylesheet. No usage data is sent to either.
 
 ## Permissions
 
