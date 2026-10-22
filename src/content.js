@@ -98,38 +98,38 @@ function parse(doc) {
         return { percent: Number(match[1]), resetAt: date ? date.getTime() : null }
     }
 
-    const session = card('gxu-currently')
-    const weekly = card('gxu-weekly')
-    if (!container || !session || !weekly) return null
+    const session = card('gxu-currently');
+    const weekly = card('gxu-weekly');
+    if (!container || !session || !weekly) return null;
     return { tier: tierText.split(/\s+/).pop() || '--', session, weekly }
 }
 
 function publish(data) {
     last = data
-    GUT.ui.render(view(data))
+    GUT.ui.render(view(data));
     try {
-        chrome.runtime.sendMessage({ type: 'usage', data }).catch(() => { })
+        chrome.runtime.sendMessage({ type: 'usage', data }).catch(() => { });
     } catch {
         // extension was reloaded while this tab stayed open, old script is orphaned
     }
 }
 
 function diagnose(doc) {
-    if (!doc) return 'no document'
+    if (!doc) return 'no document';
     const missing = ['.usage-metrics-container', '[data-test-id="gxu-currently"]', '[data-test-id="gxu-weekly"]']
-        .filter((selector) => !doc.querySelector(selector))
-    return missing.length ? `missing ${missing.join(', ')}` : 'selectors found but percent not read'
+        .filter((selector) => !doc.querySelector(selector));
+    return missing.length ? `missing ${missing.join(', ')}` : 'selectors found but percent not read';
 }
 
 function scrape(force = false) {
     const now = Date.now()
-    if (busy || !onChat()) return
-    if (!force && now - lastRun < MIN_GAP_MS) return
+    if (busy || !onChat()) return;
+    if (!force && now - lastRun < MIN_GAP_MS) return;
     busy = true
     lastRun = now
 
-    const base = (location.pathname.match(/^\/u\/\d+/) || [''])[0]
-    const frame = document.createElement('iframe')
+    const base = (location.pathname.match(/^\/u\/\d+/) || [''])[0];
+    const frame = document.createElement('iframe');
     // real size offscreen, a 0x0 frame can stop angular from rendering
     frame.style.cssText = 'position:fixed;left:-9999px;top:0;width:800px;height:600px;border:0;pointer-events:none'
     frame.setAttribute('aria-hidden', 'true')
@@ -192,13 +192,21 @@ function watchReply() {
     wasGenerating = now
 }
 
-// angular can wipe or recreate nodes on navigation, so tick re-mounts
+// angular can wipe, recreate or reorder nodes, so tick re-mounts AND re-positions
 function mountSidebar() {
-    if (document.getElementById(GUT.ui.id)) return
     const anchor =
         document.querySelector('expandable-section[storagekey="notebooks"]') ||
-        document.querySelector('expandable-section');
+        document.querySelector('expandable-section')
     if (!anchor) return
+
+    const node = document.getElementById(GUT.ui.id)
+    if (node) {
+        // already right under anchor, no-op (also stops 500ms churn)
+        if (anchor.nextElementSibling === node) return
+        // wrong spot, move same node (keeps open/closed state)
+        anchor.after(node)
+        return
+    }
     anchor.after(GUT.ui.build())
     GUT.ui.render(view(last))
 }
