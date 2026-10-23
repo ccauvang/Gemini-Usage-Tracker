@@ -5,6 +5,10 @@ Chrome and Firefox extension that shows your Gemini usage limits right on the Ge
 > [!NOTE]
 > Not affiliated with Google. Gemini is a trademark of Google.
 
+## Chrome
+
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/dpipnpibjnepbonelhnnbcoiihildhnj.svg)](https://chromewebstore.google.com/detail/gemini-usage-tracker/dpipnpibjnepbonelhnnbcoiihildhnj)
+
 ## Build
 
 Chrome needs `background.service_worker` and Firefox needs `background.scripts`, so there are two manifests: `manifest.json` for Chrome and `manifest.firefox.json` for Firefox. The build script packs each one into its own zip.
