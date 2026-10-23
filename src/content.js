@@ -5,6 +5,7 @@ const POLL_MS = 500;
 const TIMEOUT_MS = 10000;
 const MIN_GAP_MS = 15000;
 const REPLY_DEBOUNCE_MS = 2500;
+const TIER_GRACE_MS = 5000;
 
 let last = null;
 let ring = null;
@@ -18,6 +19,8 @@ let replyTimer = 0;
 let showRing = true;
 let expiredFor = 0;
 let rerun = false;
+let tier = null;
+let tierMissSince = 0;
 
 const resizeObserver = new ResizeObserver(() => schedule());
 
@@ -117,8 +120,23 @@ function parse(doc) {
     return { tier: tierText.split(/\s+/).pop() || '--', session, weekly };
 }
 
+// label renders late (angular), so a missing label only means free after a grace period
+function currentTier() {
+    const label = document.querySelector('.mavatar-tier-label');
+    const text = label ? label.textContent.trim() : '';
+    if (text) {
+        tierMissSince = 0;
+        tier = text;
+        return tier;
+    }
+    if (!tierMissSince) tierMissSince = Date.now();
+    if (Date.now() - tierMissSince > TIER_GRACE_MS) tier = 'Free';
+    return tier;
+}
+
 function publish(data) {
     last = data;
+    data.tier = currentTier() || data.tier;
     GUT.ui.render(view(data));
     try {
         chrome.runtime.sendMessage({ type: 'usage', data }).catch(() => { });
@@ -294,6 +312,10 @@ function tick() {
         if (node) node.remove();
     }
     watchReply();
+    if (last && currentTier() !== last.tier) {
+        last.tier = currentTier();
+        GUT.ui.render(view(last));
+    }
     schedule();
 }
 

@@ -1,4 +1,10 @@
-@import url("https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@100..1000&display=swap");
+@font-face {
+  font-family: 'Google Sans Flex';
+  src: url('../../assets/fonts/GoogleSansFlex-VariableFont_ROND,opsz,slnt,wdth,wght.ttf') format('truetype');
+  font-weight: 100 1000; /* Enables the full variable weight range */
+  font-style: normal;
+  font-display: swap;
+}
 
 [hidden] {
   display: none !important;

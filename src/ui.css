@@ -68,9 +68,9 @@
 #gut-usage .gut-tier {
     align-self: flex-start;
     padding: 2px 10px;
-    border-radius: 999px;
+    border-radius: 10px;
     background: color-mix(in srgb, #00cc47, transparent);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
 }
 
