@@ -128,7 +128,7 @@
         const d = new Date(ts);
         const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         if (d.toDateString() === new Date().toDateString()) return time;
-        return `${d.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' })} ${time}`;
+        return `${d.toLocaleDateString([], { day: 'numeric', month: 'short' })} ${time}`;
     }
 
     function renderRing(data) {
