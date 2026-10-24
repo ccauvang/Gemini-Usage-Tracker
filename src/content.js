@@ -2,10 +2,11 @@ const GAP = 12;
 const RING_SIZE = 64;
 const CHAT_ROUTE = /^(\/u\/\d+)?\/app(\/|$)/;
 const POLL_MS = 500;
-const TIMEOUT_MS = 10000;
+const TIMEOUT_MS = 5000;
 const MIN_GAP_MS = 15000;
 const REPLY_DEBOUNCE_MS = 2500;
 const TIER_GRACE_MS = 5000;
+const RPC_TIMEOUT_MS = 6000;
 
 let last = null;
 let ring = null;
@@ -21,6 +22,10 @@ let expiredFor = 0;
 let rerun = false;
 let tier = null;
 let tierMissSince = 0;
+let rpcSeq = 0;
+
+
+const pending = new Map();
 
 const resizeObserver = new ResizeObserver(() => schedule());
 
@@ -129,7 +134,7 @@ function currentTier() {
         tier = text;
         return tier;
     }
-    if (!tierMissSince) tierMissSince = Date.now();
+    if (!tier && Date.now() - tierMissSince > TIER_GRACE_MS) tier = 'Free';
     if (Date.now() - tierMissSince > TIER_GRACE_MS) tier = 'Free';
     return tier;
 }
@@ -152,6 +157,52 @@ function diagnose(doc) {
     return missing.length ? `missing ${missing.join(', ')}` : 'selectors found but percent not read';
 }
 
+
+window.addEventListener('message', (ev) => {
+    if (ev.source !== window || ev.origin !== location.origin) return;
+    const msg = ev.data;
+    if (!msg || msg.source !== 'gut-injector' || msg.type !== 'usage_result') return;
+    const done = pending.get(msg.id);
+    if (!done) return;
+    pending.delete(msg.id);
+    done(msg);
+})
+
+// ask the main world injector for the usage rpc, resolves null on any failure so scrape can fall back
+function fetchRows() {
+    return new Promise((resolve) => {
+        const id = ++rpcSeq;
+        const timer = setTimeout(() => {
+            pending.delete(id);
+            console.warn('[gut] rpc timeout');
+            resolve(null);
+        }, RPC_TIMEOUT_MS);
+        pending.set(id, (msg) => {
+            clearTimeout(timer);
+            if (msg.error) console.warn('[gut] rpc failed:', msg.error);
+            resolve(msg.error ? null : msg.payload);
+        });
+        window.postMessage({ source: 'gut-cs', type: 'fetch_usage', id }, location.origin);
+    })
+}
+
+// row order differs between calls, so key on the unit field (1 = session, 2 = weekly), not position
+function parseRows(payload) {
+    const list = Array.isArray(payload && payload[1]) ? payload[1] : [];
+    const rows = list.filter(Array.isArray).map((r) => ({
+        percent: Math.round(Number(r[1]) * 100),
+        unit: r[2],
+        resetAt: r[3] && r[3][0] ? r[3][0][0] * 1000 : null
+    }));
+    const session = rows.find((r) => r.unit === 1);
+    const weekly = rows.find((r) => r.unit === 2);
+    if (!session || !weekly) return null;
+    if (!Number.isFinite(session.percent) || !Number.isFinite(weekly.percent)) return null;
+    const side = (r) => ({ percent: r.percent, resetAt: r.resetAt });
+    // tier is not in the rpc, publish() fills it from the page label
+    return { tier: null, session: side(session), weekly: side(weekly) };
+}
+
 function scrape(force = false) {
     if (!chrome.runtime?.id || !onChat()) return;
     // queue forced refresh if scrape already running -- avoids dropping post-reply refresh
@@ -164,6 +215,20 @@ function scrape(force = false) {
     busy = true;
     lastRun = now;
 
+    // rpc first, iframe only when rpc fails or rows are unreadable
+    fetchRows().then((payload) => {
+        const data = parseRows(payload);
+        if (!data) return scrapeFrame(now);
+        busy = false;
+        publish(data);
+        if (rerun) {
+            rerun = false;
+            scrape(true);
+        }
+    });
+}
+
+function scrapeFrame(now) {
     const base = (location.pathname.match(/^\/u\/\d+/) || [''])[0];
     const frame = document.createElement('iframe');
     // real size offscreen, a 0x0 frame can stop angular from rendering
@@ -312,10 +377,8 @@ function tick() {
         if (node) node.remove();
     }
     watchReply();
-    if (last && currentTier() !== last.tier) {
-        last.tier = currentTier();
-        GUT.ui.render(view(last));
-    }
+    const t = currentTier();
+    if (last && t && t !== last.tier) publish(last);
     schedule();
 }
 

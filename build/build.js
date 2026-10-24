@@ -25,11 +25,16 @@ for (const target of targets) {
     }
 }
 
-const version = JSON.parse(fs.readFileSync(path.join(ROOT, 'manifest.json'), 'utf8')).version
-
 fs.rmSync(DIST, { recursive: true, force: true })
 
 for (const target of targets) {
+    // each store gets its own manifest version, so a firefox only bump names the firefox zip right
+    const version = JSON.parse(fs.readFileSync(path.join(ROOT, target.manifest), 'utf8')).version
+    if (!version) {
+        console.error(`no version in ${target.manifest}`)
+        process.exit(1)
+    }
+
     const stage = path.join(DIST, target.name)
     fs.mkdirSync(stage, { recursive: true })
 

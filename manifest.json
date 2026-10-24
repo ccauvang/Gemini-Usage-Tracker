@@ -1,9 +1,9 @@
 {
     "manifest_version": 3,
     "name": "Gemini Usage Tracker",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Show Gemini usage on the main chat page.",
-    "minimum_chrome_version": "102",
+    "minimum_chrome_version": "111",
     "permissions": [
         "declarativeNetRequest",
         "storage"
@@ -27,6 +27,16 @@
                 "src/ui.css"
             ],
             "run_at": "document_idle"
+        },
+        {
+            "matches": [
+                "https://gemini.google.com/*"
+            ],
+            "js": [
+                "src/injector.js"
+            ],
+            "run_at": "document_start",
+            "world": "MAIN"
         }
     ],
     "action": {
