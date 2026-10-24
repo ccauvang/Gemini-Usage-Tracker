@@ -115,10 +115,20 @@
         const tip = createElement('div', 'gut-ring-tip');
         tip.append(
             createElement('div', 'gut-tip-session', 'Session: --'),
-            createElement('div', 'gut-tip-weekly', 'Weekly: --')
+            createElement('div', 'gut-tip-weekly', 'Weekly: --'),
+            createElement('div', 'gut-tip-reset', 'Reset at: --')
         );
         root.append(box, tip);
         return root;
+    }
+
+    // exact local time - date only when reset is not today
+    function fmtAt(ts) {
+        if (!ts) return '--';
+        const d = new Date(ts);
+        const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        if (d.toDateString() === new Date().toDateString()) return time;
+        return `${d.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' })} ${time}`;
     }
 
     function renderRing(data) {
@@ -132,6 +142,7 @@
         root.querySelector('.gut-ring-time').textContent = (session && session.reset) || '--';
         root.querySelector('.gut-tip-session').textContent = `Session: ${sp === null ? '--' : `${sp}%`}`;
         root.querySelector('.gut-tip-weekly').textContent = `Weekly: ${wp === null ? '--' : `${wp}%`}`;
+        root.querySelector('.gut-tip-reset').textContent = `Reset at: ${fmtAt(session && session.resetAt)}`;
         const mark = root.querySelector('.gut-ring-mark');
         mark.style.display = wp === null ? 'none' : '';
         mark.style.transform = `rotate(${(wp ?? 0) * 3.6}deg)`;

@@ -100,7 +100,7 @@ function fmtLeft(resetAt) {
 // scrape data keeps resetAt, ui wants the text, so convert right before render
 function view(data) {
     if (!data) return null;
-    const side = (c) => ({ percent: c.percent, reset: fmtLeft(c.resetAt) });
+    const side = (c) => ({ percent: c.percent, reset: fmtLeft(c.resetAt), resetAt: c.resetAt });
     return { tier: data.tier, session: side(data.session), weekly: side(data.weekly) };
 }
 
