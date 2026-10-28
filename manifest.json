@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Gemini Usage Tracker",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "Show Gemini usage on the main chat page.",
     "minimum_chrome_version": "111",
     "permissions": [
