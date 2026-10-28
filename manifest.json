@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Gemini Usage Tracker",
     "version": "0.2.1",
-    "description": "Show Gemini usage on the main chat page.",
+    "description": "See your Gemini session and weekly usage limits with reset countdown. No data collected.",
     "minimum_chrome_version": "111",
     "permissions": [
         "declarativeNetRequest",
