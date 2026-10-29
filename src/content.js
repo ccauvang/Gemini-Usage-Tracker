@@ -134,7 +134,7 @@ function currentTier() {
         tier = text;
         return tier;
     }
-    if (!tier && Date.now() - tierMissSince > TIER_GRACE_MS) tier = 'Free';
+    if (!tierMissSince) tierMissSince = Date.now();
     if (Date.now() - tierMissSince > TIER_GRACE_MS) tier = 'Free';
     return tier;
 }
