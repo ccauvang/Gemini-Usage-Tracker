@@ -7,7 +7,7 @@ Chrome and Firefox extension that shows your Gemini usage limits right on the Ge
 
 ## Chrome
 
-[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/dpipnpibjnepbonelhnnbcoiihildhnj.svg)](https://chromewebstore.google.com/detail/gemini-usage-tracker/dpipnpibjnepbonelhnnbcoiihildhnj)
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/dpipnpibjnepbonelhnnbcoiihildhnj?logo=chromewebstore)](https://chromewebstore.google.com/detail/gemini-usage-tracker/dpipnpibjnepbonelhnnbcoiihildhnj)
 
 ## Build
 
