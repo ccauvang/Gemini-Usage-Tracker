@@ -191,7 +191,8 @@
 
 #gut-ring .gut-ring-tip {
     position: absolute;
-    right: 0;
+    left: 50%;
+    transform: translateX(-50%);
     bottom: calc(100% + 8px);
     padding: 6px 10px;
     border-radius: 6px;
