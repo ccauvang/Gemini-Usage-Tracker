@@ -23,6 +23,8 @@ let rerun = false;
 let tier = null;
 let tierMissSince = 0;
 let rpcSeq = 0;
+let following = false;
+let followUntil = 0;
 
 
 const pending = new Map();
@@ -355,6 +357,23 @@ function schedule() {
     });
 }
 
+// transitions move the box without resizing it, so ResizeObserver stays silent - track every frame instead
+function follow(ev) {
+    if (ev.target.closest && ev.target.closest('#gut-ring')) return;
+    followUntil = Date.now() + 600;
+    if (following) return;
+    following = true;
+    const step = () => {
+        place();
+        if (Date.now() < followUntil) {
+            requestAnimationFrame(step);
+        } else {
+            following = false;
+        }
+    };
+    requestAnimationFrame(step);
+}
+
 function tick() {
     if (!chrome.runtime?.id) {
         // extension reloaded -- kill timers and observers so old script stops touching dom
@@ -362,6 +381,8 @@ function tick() {
         clearInterval(renderTimer);
         resizeObserver.disconnect();
         window.removeEventListener('resize', schedule);
+        document.removeEventListener('transitionrun', follow, true);
+        document.removeEventListener('transitionend', schedule, true);
         ring?.remove();
         document.getElementById(GUT.ui.id)?.remove();
         return;
@@ -409,6 +430,9 @@ chrome.storage.onChanged.addListener((changes, area) => {
 });
 
 window.addEventListener('resize', schedule);
+document.addEventListener('transitionrun', follow, true);
+document.addEventListener('transitionend', schedule, true);
+
 const renderTimer = setInterval(() => {
     GUT.ui.render(view(last));
     checkExpired();
