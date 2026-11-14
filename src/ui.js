@@ -156,6 +156,38 @@
         node.querySelector('.gut-fill').style.width = `${pct ?? 0}%`;
         const reset = data && data.reset;
         node.querySelector('.gut-reset').textContent = reset ? `⏱ ${reset}` : '';
+        node.dataset.resetAt = data && data.resetAt ? String(data.resetAt) : '';
+    }
+
+    // tip lives on body - .gut-body is overflow hidden and would clip it
+    const ROW_TIP_ID = 'gut-row-tip';
+
+    function rowTip() {
+        let tip = document.getElementById(ROW_TIP_ID);
+        if (!tip) {
+            tip = createElement('div');
+            tip.id = ROW_TIP_ID;
+            document.body.append(tip);
+        }
+        return tip;
+    }
+
+    function showRowTip(row) {
+        const tip = rowTip();
+        tip.textContent = `Reset at: ${fmtAt(Number(row.dataset.resetAt))}`;
+        const r = row.getBoundingClientRect();
+        const t = tip.getBoundingClientRect();
+        const left = Math.min(Math.max(8, r.left + r.width / 2 - t.width / 2), window.innerWidth - t.width - 8);
+        // flip below when no room above
+        const top = r.top - t.height - 8 < 8 ? r.bottom + 8 : r.top - t.height - 8;
+        tip.style.left = `${left}px`;
+        tip.style.top = `${top}px`;
+        tip.dataset.show = 'true';
+    }
+
+    function hideRowTip() {
+        const tip = document.getElementById(ROW_TIP_ID);
+        if (tip) tip.dataset.show = 'false';
     }
 
     // data = { tier, session: { percent, reset }, weekly: { percent, reset } }, null = empty state
@@ -167,6 +199,14 @@
         setRow(root, 'session', data && data.session);
         setRow(root, 'weekly', data && data.weekly);
     }
+
+    // one listener, any hover off a row hides the tip - also covers row removed while hovered
+    document.addEventListener('mouseover', (ev) => {
+        const row = ev.target.closest && ev.target.closest(`#${ROOT_ID} .gut-row`);
+        if (row) showRowTip(row);
+        else hideRowTip();
+    });
+    document.documentElement.addEventListener('mouseleave', hideRowTip);
 
     NS.ui = { build, buildRing, render, id: ROOT_ID };
 })();

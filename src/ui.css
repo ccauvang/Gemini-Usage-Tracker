@@ -212,3 +212,26 @@
     visibility: visible;
     transition: opacity 0.15s ease;
 }
+
+#gut-row-tip {
+    position: fixed;
+    z-index: 9999;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: #303030;
+    color: #e3e3e3;
+    font-family: "Google Sans Flex", "Google Sans", "Google Sans Text", Roboto, Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease, visibility 0s 0.15s;
+}
+
+#gut-row-tip[data-show="true"] {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.15s ease;
+}
