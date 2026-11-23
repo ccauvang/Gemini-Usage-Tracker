@@ -317,10 +317,15 @@ function mountSidebar() {
 }
 
 function ensureRing() {
-    if (ring && ring.isConnected) return ring;
+    // body-level ring paints over fullscreen preview or under the fade overlay - input-container sits in the right layer
+    const host = document.querySelector('input-container') || document.body;
+    if (ring && ring.isConnected) {
+        if (ring.parentElement !== host) host.append(ring);
+        return ring;
+    }
     ring = GUT.ui.buildRing();
     ring.hidden = true;
-    document.body.append(ring);
+    host.append(ring);
     GUT.ui.render(view(last));
     return ring;
 }
@@ -342,10 +347,20 @@ function place() {
     }
     const rect = box.getBoundingClientRect();
     node.style.color = getComputedStyle(box).color;
+
+    // overlay on top of the chat bar - elementFromPoint hits the overlay, not the bar, so hide ring
+    const probe = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    const covered = !!probe && !node.parentElement.contains(probe);
+
     const fits = rect.width > 0 && rect.right + GAP + RING_SIZE <= window.innerWidth;
-    node.hidden = !fits;
-    node.style.left = `${rect.right + GAP}px`;
-    node.style.top = `${rect.bottom - RING_SIZE}px`;
+    node.hidden = !fits || covered;
+
+    // fixed inside a transformed ancestor is relative to it - measure real origin at 0,0 and subtract
+    node.style.left = '0px';
+    node.style.top = '0px';
+    const origin = node.getBoundingClientRect();
+    node.style.left = `${rect.right + GAP - origin.left}px`;
+    node.style.top = `${rect.bottom - RING_SIZE - origin.top}px`;
 }
 
 function schedule() {
