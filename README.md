@@ -9,6 +9,10 @@ Chrome and Firefox extension that shows your Gemini usage limits right on the Ge
 
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/dpipnpibjnepbonelhnnbcoiihildhnj?logo=chromewebstore)](https://chromewebstore.google.com/detail/gemini-usage-tracker/dpipnpibjnepbonelhnnbcoiihildhnj)
 
+## Firefox
+
+[![Mozilla Add-Ons](https://img.shields.io/amo/v/gemini-usage-tracker?logo=mozilla&logoColor=00DF33&color=green)](https://addons.mozilla.org/en-US/firefox/addon/gemini-usage-tracker/)
+
 ## Build
 
 Chrome needs `background.service_worker` and Firefox needs `background.scripts`, so there are two manifests: `manifest.json` for Chrome and `manifest.firefox.json` for Firefox. The build script packs each one into its own zip, named with that manifest's own version.
